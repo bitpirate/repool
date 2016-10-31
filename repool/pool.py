@@ -29,10 +29,21 @@ class PoolException(Exception):
 
 
 class ConnectionWrapper(object):
-    def __init__(self, pool, conn=None, **kwargs):
+    def __init__(self, pool, conn=None, conn_type=None, **kwargs):
         self._pool = pool
         if conn is None:
-            self._conn = r.connect(**kwargs)
+            if conn_type is None:
+                # this uses the application's connection type, set via
+                # r.set_loop_type options:
+                # tornado, twisted, gevent (same as DefaultConnection), asyncio
+                self._conn = r.connect(**kwargs)
+            else:
+                # choices:
+                # r.net.DefaultConnection
+                # r.net_tornado.Connection
+                # r.net_twisted.Connection
+                # r.net_asyncio.Connection
+                self._conn = conn_type(**kwargs)
         else:
             self._conn = conn
         self.connected_at = time.time()
