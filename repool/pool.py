@@ -43,7 +43,8 @@ class ConnectionWrapper(object):
                 # r.net_tornado.Connection
                 # r.net_twisted.Connection
                 # r.net_asyncio.Connection
-                self._conn = conn_type(**kwargs)
+                unconnected_conn = conn_type(**kwargs)
+                self._conn = unconnected_conn.reconnect(kwargs.get('timeout', 20))
         else:
             self._conn = conn
         self.connected_at = time.time()
